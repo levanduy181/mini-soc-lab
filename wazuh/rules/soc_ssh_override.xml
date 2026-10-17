@@ -1,0 +1,23 @@
+
+<group name="syslog,sshd,">
+
+  <rule id="5763"
+        level="10"
+        frequency="11"
+        timeframe="60"
+        ignore="120"
+        overwrite="yes">
+
+    <if_matched_sid>5760</if_matched_sid>
+    <same_srcip />
+
+    <description>SSHD: Repeated authentication failures from the same IP within 60 seconds.</description>
+
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+
+    <group>authentication_failures,</group>
+  </rule>
+
+</group>

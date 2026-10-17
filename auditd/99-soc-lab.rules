@@ -1,0 +1,29 @@
+
+# SOC LAB - Ubuntu Audit Rules
+
+# 1. Credential access
+-w /etc/shadow -p r -k audit-wazuh-r
+-w /etc/gshadow -p r -k audit-wazuh-r
+
+# 2. Account and privilege changes
+-w /etc/passwd -p wa -k audit-wazuh-w
+-w /etc/group -p wa -k audit-wazuh-w
+-w /etc/sudoers -p wa -k audit-wazuh-w
+-w /etc/sudoers.d -p wa -k audit-wazuh-w
+
+# 3. Persistence
+-w /etc/crontab -p wa -k audit-wazuh-w
+-w /etc/cron.d -p wa -k audit-wazuh-w
+-w /etc/systemd/system -p wa -k audit-wazuh-w
+-w /etc/profile.d -p wa -k audit-wazuh-w
+
+# 4. Shell, LOLBins, account commands and discovery
+# Monitor executions by logged-in users, including sudo
+-a always,exit -F arch=b64 -S execve -F auid>=1000 -F auid!=4294967295 -k audit-wazuh-c
+
+# 5. ptrace activity - attempted process memory access
+-a always,exit -F arch=b64 -S ptrace -F a0=16 -F auid>=1000 -F auid!=4294967295 -k audit-wazuh-c
+-a always,exit -F arch=b64 -S ptrace -F a0=16902 -F auid>=1000 -F auid!=4294967295 -k audit-wazuh-c
+
+# 6. Removal/renaming of files under /var/log
+-a always,exit -F arch=b64 -S unlink -S unlinkat -S rename -S renameat -F dir=/var/log -F auid>=1000 -F auid!=4294967295 -k audit-wazuh-c

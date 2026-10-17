@@ -1,0 +1,179 @@
+
+<group name="soc_ubuntu,">
+
+  <!-- 100301: Sensitive credential file access -->
+  <rule id="100301" level="12">
+    <if_sid>80783</if_sid>
+    <field name="audit.file.name" type="pcre2">^/etc/(shadow|gshadow)$</field>
+    <description>SOC Linux: Sensitive credential file accessed.</description>
+    <mitre>
+      <id>T1003.008</id>
+    </mitre>
+  </rule>
+
+  <!-- 100302: Cron, Systemd, shell startup modification -->
+  <rule id="100302" level="11">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">^/etc/(cron\.d/|systemd/system/|profile\.d/|crontab$)|^/home/duylv/\.(bashrc|profile|bash_profile)$</field>
+    <description>SOC Linux: Persistence-related file changed.</description>
+    <mitre>
+      <id>T1543.002</id>
+    </mitre>
+  </rule>
+
+  <!-- 100303: Sudoers changed -->
+  <rule id="100303" level="12">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">^/etc/sudoers($|\.d/)</field>
+    <description>SOC Linux: Sudoers configuration changed.</description>
+    <mitre>
+      <id>T1548.003</id>
+    </mitre>
+  </rule>
+
+  <!-- 100304: SSH authorized_keys changed -->
+  <rule id="100304" level="12">
+    <if_sid>550,553,554</if_sid>
+    <field name="file" type="pcre2">^/home/duylv/\.ssh/authorized_keys$</field>
+    <description>SOC Linux: SSH authorized_keys changed.</description>
+    <mitre>
+      <id>T1098.004</id>
+    </mitre>
+  </rule>
+
+  <!-- 100305: Account database changed -->
+  <rule id="100305" level="10">
+    <if_sid>80780</if_sid>
+    <field name="audit.file.name" type="pcre2">^/etc/(passwd|group)$</field>
+    <description>SOC Linux: User or group database modified.</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+  </rule>
+
+  <!-- 100306: Log removal or rename attempt -->
+  <rule id="100306" level="13">
+    <if_sid>80792</if_sid>
+    <field name="audit.file.name" type="pcre2">^/var/log/</field>
+    <field name="audit.syscall" type="pcre2">^(82|87|263|264)$</field>
+    <description>SOC Linux: Security log deletion or rename indicator.</description>
+    <mitre>
+      <id>T1070.002</id>
+    </mitre>
+  </rule>
+
+  <!-- 100307: User creation command -->
+  <rule id="100307" level="9">
+    <if_sid>80792</if_sid>
+    <field name="audit.command" type="pcre2">^(useradd|adduser)$</field>
+    <description>SOC Linux: Local account creation command executed.</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+  </rule>
+
+  <!-- 100308: Account privilege modification commands -->
+  <rule id="100308" level="10">
+    <if_sid>80792</if_sid>
+    <field name="audit.command" type="pcre2">^(usermod|gpasswd)$</field>
+    <description>SOC Linux: User or group modification command executed.</description>
+    <mitre>
+      <id>T1098</id>
+    </mitre>
+  </rule>
+
+  <!-- 100309: Shell or interpreter command execution -->
+  <rule id="100309" level="9">
+    <if_sid>80792</if_sid>
+    <field name="audit.command" type="pcre2">^(bash|dash|sh|python|python3|perl)$</field>
+    <field name="audit.execve.a1" type="pcre2">^(-c|-e|--eval)$</field>
+    <description>SOC Linux: Shell or interpreter command execution indicator.</description>
+    <mitre>
+      <id>T1059.004</id>
+    </mitre>
+  </rule>
+
+  <!-- 100310: Network-capable LOLBins -->
+  <rule id="100310" level="6">
+    <if_sid>80792</if_sid>
+    <field name="audit.command" type="pcre2">^(curl|wget)$</field>
+    <description>SOC Linux: Network utility executed; review destination and context.</description>
+    <mitre>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <!-- 100311: System discovery command -->
+  <rule id="100311" level="4">
+    <if_sid>80792</if_sid>
+    <field name="audit.command" type="pcre2">^(whoami|id|uname|ip|ss)$</field>
+    <description>SOC Linux: System discovery command executed.</description>
+    <mitre>
+      <id>T1082</id>
+    </mitre>
+  </rule>
+
+  <!-- 100312: Repeated discovery by the same login user -->
+  <rule id="100312" level="10" frequency="5" timeframe="60" ignore="120">
+    <if_matched_sid>100311</if_matched_sid>
+    <same_field>audit.auid</same_field>
+    <description>SOC Linux: Repeated system discovery within 60 seconds.</description>
+    <mitre>
+      <id>T1082</id>
+    </mitre>
+  </rule>
+
+  <!-- 100313: ptrace syscall, x86_64 -->
+  <rule id="100313" level="12">
+    <if_sid>80792</if_sid>
+    <field name="audit.syscall" type="pcre2">^101$</field>
+    <description>SOC Linux: ptrace syscall detected; investigate process memory access.</description>
+    <mitre>
+      <id>T1055</id>
+    </mitre>
+  </rule>
+
+  <!-- 100314: Successful SSH authentication -->
+  <rule id="100314" level="7">
+    <if_sid>5715</if_sid>
+    <description>SOC Linux: Successful SSH login; review source IP.</description>
+    <mitre>
+      <id>T1021.004</id>
+    </mitre>
+  </rule>
+
+  <!-- SSH brute-force detection -->
+  <rule id="100315" level="12">
+    <if_sid>5763</if_sid>
+    <description>SOC Linux: SSH brute-force detected.</description>
+    <group>authentication_failures,</group>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+  </rule>
+
+  <!-- 100316: Attempt to stop a security service -->
+  <rule id="100316" level="12">
+    <if_sid>80792</if_sid>
+    <field name="audit.command" type="pcre2">^systemctl$</field>
+    <field name="audit.execve.a1" type="pcre2">^(stop|disable|mask)$</field>
+    <field name="audit.execve.a2" type="pcre2">^(auditd|rsyslog|wazuh-agent|systemd-journald)(\.service)?$</field>
+    <description>SOC Linux: Attempt to stop or disable a security logging service.</description>
+    <mitre>
+      <id>T1562.001</id>
+    </mitre>
+  </rule>
+
+  <!-- SSH success after repeated failures -->
+  <rule id="100317" level="13" frequency="10" timeframe="300">
+    <if_sid>5715</if_sid>
+    <if_matched_sid>5760</if_matched_sid>
+    <same_srcip />
+    <description>SOC Linux: SSH login succeeded after repeated failed attempts from the same source IP.</description>
+    <mitre>
+      <id>T1110.001</id>
+      <id>T1078</id>
+    </mitre>
+  </rule>
+
+</group>

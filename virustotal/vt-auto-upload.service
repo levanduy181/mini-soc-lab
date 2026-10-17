@@ -1,0 +1,15 @@
+[Unit]
+Description=VirusTotal Automatic File Upload
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=duylv
+EnvironmentFile=/home/duylv/.config/vt-auto-upload/env
+ExecStart=/usr/bin/python3 -u /home/duylv/vt_auto_upload.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
