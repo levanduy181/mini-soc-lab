@@ -45,9 +45,3 @@ File Monitoring → VirusTotal API → Shuffle SOAR → Telegram
 - Tested SSH event correlation with positive and negative scenarios
 - Verified Shuffle-to-Telegram alert delivery
 - Tested VirusTotal notification filtering using simulated analysis results
-
-## Security Notice
-
-API keys, authentication tokens, webhook URLs, and sensitive system logs are excluded from this repository.
-
-This project was developed in an isolated lab environment for educational and defensive security purposes.
